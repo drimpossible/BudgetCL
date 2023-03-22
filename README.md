@@ -9,13 +9,23 @@ This repository contains the code for the paper:
 [[PDF](https://github.com/drimpossible/drimpossible.github.io/raw/master/documents/BudgetCL.pdf)]
 [[Bibtex](https://github.com/drimpossible/BudgetCL/#citation)]
 
-## Installation and Dependencies
+## Dependencies
 
 * Install all requirements required to run the code on Pytorch 2.x (backward compatible) by:
  ```	
 # First, activate a new virtual environment
 $ pip3 install -r requirements.txt
  ```
+
+## Downloading Datasets
+
+### Downloading ImageNet2K
+
+
+### Downloading CGLM
+
+To download Continual Google Landmarks V2 (CGLM), please follow instructions from repository for [ACM](github.com/drimpossible/LargeOCL).
+
 
 ## Running Models on Our Benchmark
 
