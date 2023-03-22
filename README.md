@@ -7,7 +7,6 @@ This repository contains the code for the paper:
 
 [[Arxiv](https://arxiv.org/abs/2303.11165)]
 [[PDF](https://github.com/drimpossible/drimpossible.github.io/raw/master/documents/BudgetCL.pdf)]
-[[Slides]()]
 [[Bibtex](https://github.com/drimpossible/BudgetCL/#citation)]
 
 ## Installation and Dependencies
