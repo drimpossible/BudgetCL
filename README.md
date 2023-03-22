@@ -24,7 +24,7 @@ $ pip3 install -r requirements.txt
 
 ### Downloading CGLM
 
-To download Continual Google Landmarks V2 (CGLM), please follow instructions from repository for [ACM](github.com/drimpossible/LargeOCL).
+To download Continual Google Landmarks V2 (CGLM), please follow instructions from repository for [ACM](https://github.com/drimpossible/LargeOCL).
 
 
 ## Running Models on Our Benchmark
