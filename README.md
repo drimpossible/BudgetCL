@@ -1,1 +1,36 @@
 # BudgetCL
+
+This repository contains the code for the paper:
+
+**Computationally Budgeted Continual Learning: What Does Matter?, CVPR 2023**  
+[Ameya Prabhu*](https://drimpossible.github.io), [Hasan Abed Al Kader Hammoud*](https://github.com/hammoudhasan), [Puneet Dokania](https://puneetkdokania.github.io), [Philip Torr](https://www.robots.ox.ac.uk/~phst/), [Ser-Nam Lim](https://sites.google.com/site/sernam), [Bernard Ghanem](https://www.bernardghanem.com/), [Adel Bibi](https://www.adelbibi.com/)
+
+[[Arxiv](https://arxiv.org/abs/2303.11165)]
+[[PDF](https://github.com/drimpossible/drimpossible.github.io/raw/master/documents/BudgetCL.pdf)]
+[[Slides]()]
+[[Bibtex](https://github.com/drimpossible/BudgetCL/#citation)]
+
+## Installation and Dependencies
+
+- TBA
+
+## Running Models on Our Benchmark
+
+## Reproducing All Experiments
+
+- TBA
+
+##### If you discover any bugs in the code please contact me, I will cross-check them with my nightmares.
+
+## Citation
+
+We hope our benchmark and contributions are valuable to advance your work in continual learning! To cite our work:
+
+```
+@inproceedings{prabhu2023computationally,
+  title={Computationally Budgeted Continual Learning: What Does Matter?},
+  author={Prabhu, Ameya and Hammoud, Hasan Abed Al Kader and Dokania, Puneet and Torr, Philip HS and Lim, Ser-Nam and Ghanem, Bernard and Bibi, Adel},
+  booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year={2023},
+}
+```
