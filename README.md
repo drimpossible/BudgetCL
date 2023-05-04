@@ -11,7 +11,7 @@ This repository contains the code for the paper:
 
 ## Dependencies
 
-* Install all requirements required to run the code on Pytorch 2.x (backward compatible) by:
+* Install all requirements required to run the code by:
  ```	
 # First, activate a new virtual environment
 $ pip3 install -r requirements.txt
