@@ -19,12 +19,12 @@ $ pip3 install -r requirements.txt
 
 ## Downloading Datasets
 
-### Downloading ImageNet2K
+### Creating the Continual ImageNet2K dataset
 
 
-### Downloading CGLM
+### Creating the Continual Google Landmarks V2 dataset
 
-To download Continual Google Landmarks V2 (CGLM), please follow instructions from repository for [ACM](https://github.com/drimpossible/LargeOCL).
+To download Continual Google Landmarks V2 (CGLM), please follow instructions from repository for [ACM](https://github.com/drimpossible/ACM).
 
 
 ## Running Models on Our Benchmark
