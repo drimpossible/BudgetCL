@@ -9,7 +9,9 @@ This repository contains the code for the paper:
 [[PDF](https://github.com/drimpossible/drimpossible.github.io/raw/master/documents/BudgetCL.pdf)]
 [[Bibtex](https://github.com/drimpossible/BudgetCL/#citation)]
 
-## Dependencies
+## Getting started
+
+Running our code requires 1 80GB A100 GPU with Pytorch 2.0 but is backward compatible.
 
 * Install all requirements required to run the code by:
  ```	
@@ -17,7 +19,7 @@ This repository contains the code for the paper:
 $ pip3 install -r requirements.txt
  ```
 
-## Downloading Datasets
+## Setting up the Datasets
 
 ### Creating the Continual ImageNet2K dataset
 
@@ -26,8 +28,26 @@ $ pip3 install -r requirements.txt
 
 To download Continual Google Landmarks V2 (CGLM), please follow instructions from repository for [ACM](https://github.com/drimpossible/ACM).
 
+### Directory structure
 
-## Running Models on Our Benchmark
+After setting up the datasets and the environment, the project root folder should look like this:
+```
+BudgetCL/
+|–– data/
+|–––– cglm/
+|–––– clim2k/
+|–– src/
+|–––– clean.sh
+|–– scripts/
+|–– README.md
+|–– requirements.txt
+|–– .gitignore
+|–– LICENSE
+
+```
+## Running a Model
+
+
 
 ## Reproducing All Experiments
 
