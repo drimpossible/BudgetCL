@@ -22,7 +22,8 @@ def parse_args():
 #    ## Model
    parser.add_argument('--optimizer', type=str, default='SGD', choices=['SGD'], help='Optimizer type chosen for the network')
    parser.add_argument('--model', type=str, default='resnet50', choices=['resnet50_i1b', 'resnet50'], help='Model architecture')
-   parser.add_argument('--sampling_mode', type=str, default='uniform', choices=['uniform', 'class_balanced', 'lastk', 'herding', 'kmeans', 'unc_lc', 'max_loss'], help='Sampling Strategies Tested')
+   parser.add_argument('--model_type', type=str, default='normal', choices=['normal', 'gdumb'], help='Model architecture')
+   parser.add_argument('--sampling_mode', type=str, default='uniform', choices=['uniform', 'class_balanced', 'lastk', 'herding', 'kmeans', 'unc_lc', 'max_loss', 'recency_biased'], help='Sampling Strategies Tested')
    parser.add_argument('--fc',type=str, default='linear', choices=['linear','cosine_linear','linear_only', 'ace'], help='Last layer training strategies')
    parser.add_argument('--momentum', type=float, default=0.9, help='Optimizer Momentum')
    parser.add_argument('--distill', type=str, default=None, choices=['cosine','mse','bce', 'ce'], help='Disllation Mode')

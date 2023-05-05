@@ -28,7 +28,6 @@ class CosineLinear(nn.Module):
                 F.normalize(self.weight, p=2, dim=1))
         if self.sigma is not None:
             out = self.sigma * out
-        
         return out
 
 
@@ -77,6 +76,7 @@ def correct_weights(model, valloader, calibration_method, logger, expand_size):
         calibrator = BiC(num_new_cls=expand_size).cuda()
         calib_optimizer =  Adam(calibrator.parameters(), lr=0.01)
         
+        ### TODO: Optimize to consume tiny computational cost by optimizing on a small set of valset, reusing predictions
         for lr_exp in range(2,4):
             # Assuming that 8 epochs each with a lr decay by 10 suffices to make the calibrator converge (loss does stop decreasing) 
             for param_group in calib_optimizer.param_groups: 
@@ -98,6 +98,7 @@ def correct_weights(model, valloader, calibration_method, logger, expand_size):
         calibrator = Temperature().cuda()
         calib_optimizer =  Adam(calibrator.parameters(), lr=0.01)
         
+        ### TODO: Optimize for minimal computational overhead by ternary search, no sgd needed 
         for lr_exp in range(2,4):
             # Assuming that 8 epochs each with a lr decay by 10 suffices to make the calibrator converge (loss does stop decreasing) 
             for param_group in calib_optimizer.param_groups: 
