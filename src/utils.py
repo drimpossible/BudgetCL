@@ -39,7 +39,6 @@ class LinearLR(_LRScheduler):
         return self.get_lr()
 
 
-
 class Summary(Enum):
     NONE = 0
     AVERAGE = 1

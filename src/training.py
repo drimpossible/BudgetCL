@@ -1,25 +1,18 @@
 import torch, os
-import time
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.nn.parallel
-import torch.optim
-import torch.utils.data
 from torchvision.models.feature_extraction import create_feature_extractor
-import math
 from utils import AverageMeter, ProgressMeter, accuracy, Summary
 import numpy as np
 
 
 def train(opt, loader, model, optimizer, scheduler, logger, prevmodel=None, temperature=2.0):
-    batch_time = AverageMeter('Time', ':6.3f')
-    data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
     top5 = AverageMeter('Acc@5', ':6.2f')
     progress = ProgressMeter(logger,
         len(loader),
-        [batch_time, data_time, losses, top1, top5],
+        [losses, top1, top5],
         prefix="Timestep: [{}]".format(opt.timestep))
 
     # Switch to train mode
@@ -27,45 +20,42 @@ def train(opt, loader, model, optimizer, scheduler, logger, prevmodel=None, temp
     if prevmodel is not None:
         prevmodel.eval()
     distill_target = None
-    end = time.time()
 
     for i, (images, target) in enumerate(loader):
         # measure data loading time
-        data_time.update(time.time() - end)
 
         images = images.cuda(non_blocking=True)
         target = target.cuda(non_blocking=True)
 
         # compute output
-        with torch.cuda.amp.autocast(enabled=True, dtype=torch.bfloat16):
-            output = model(images)
-            loss = nn.CrossEntropyLoss()(output, target)
-
-            # Distillation of different types -- lambda is hyperparam-searched over
-            if opt.distill is not None and prevmodel is not None:
-                with torch.no_grad():
-                    prevoutput = prevmodel(images)
-                    prevoutput = prevoutput.detach()/temperature
-                
-                distill_output = output[:,:prevoutput.size(1)]/temperature
-                
-                if opt.distill == 'BCE':
-                    # Ref: iCaRL Incremental Classifier and Representation Learning (https://arxiv.org/abs/1611.07725)
-                    prevprobs = F.softmax(prevoutput, dim=1)
-                    loss += 1.0 * F.binary_cross_entropy_with_logits(input=distill_output, target=prevprobs)
-                elif opt.distill == 'CrossEntropy':
-                    # Ref: Large Scale Incremental Learning (https://arxiv.org/abs/1905.13260)
-                    prevprobs = F.softmax(prevoutput, dim=1)
-                    log_inp = F.log_softmax(distill_output, dim=1)
-                    loss += prevoutput.size(1)/(output.size(1)) * F.kl_div(input=log_inp, target=prevprobs)
-                elif opt.distill == 'Cosine':
-                    if distill_target is None:
-                        distill_target = torch.ones(prevoutput.shape[0]).cuda()
-                    # Ref: Learning a Unified Classifier Incrementally via Rebalancing (http://openaccess.thecvf.com/content_CVPR_2019/papers/Hou_Learning_a_Unified_Classifier_Incrementally_via_Rebalancing_CVPR_2019_paper.pdf)
-                    loss += max(0.5, math.sqrt((output.size(1)-prevoutput.size(1))/prevoutput.size(1))) * F.cosine_embedding_loss(input1=distill_output, input2=prevoutput, target=distill_target)
-                elif opt.distill == 'MSE':
-                    # Ref: Dark Experience for General Continual Learning: A Strong, Simple Baseline (https://arxiv.org/pdf/2004.07211.pdf)
-                    loss += 0.5 * F.mse_loss(input=distill_output, target=prevoutput)
+        output = model(images)
+        loss = nn.CrossEntropyLoss()(output, target)
+        
+        # Distillation of different types -- lambda is hyperparam-searched over
+        if opt.distill is not None and prevmodel is not None:
+            with torch.no_grad():
+                prevoutput = prevmodel(images)
+                prevoutput = prevoutput.detach()/temperature
+            
+            distill_output = output[:,:prevoutput.size(1)]/temperature
+            
+            if opt.distill == 'BCE':
+                # Ref: iCaRL Incremental Classifier and Representation Learning (https://arxiv.org/abs/1611.07725)
+                prevprobs = F.softmax(prevoutput, dim=1)
+                loss += 1.0 * F.binary_cross_entropy_with_logits(input=distill_output, target=prevprobs)
+            elif opt.distill == 'CrossEntropy':
+                # Ref: Large Scale Incremental Learning (https://arxiv.org/abs/1905.13260)
+                prevprobs = F.softmax(prevoutput, dim=1)
+                log_inp = F.log_softmax(distill_output, dim=1)
+                loss += prevoutput.size(1)/(output.size(1)) * F.kl_div(input=log_inp, target=prevprobs)
+            elif opt.distill == 'Cosine':
+                if distill_target is None:
+                    distill_target = torch.ones(prevoutput.shape[0]).cuda()
+                # Ref: Learning a Unified Classifier Incrementally via Rebalancing (http://openaccess.thecvf.com/content_CVPR_2019/papers/Hou_Learning_a_Unified_Classifier_Incrementally_via_Rebalancing_CVPR_2019_paper.pdf)
+                loss += max(0.5, np.sqrt((output.size(1)-prevoutput.size(1))/prevoutput.size(1))) * F.cosine_embedding_loss(input1=distill_output, input2=prevoutput, target=distill_target)
+            elif opt.distill == 'MSE':
+                # Ref: Dark Experience for General Continual Learning: A Strong, Simple Baseline (https://arxiv.org/pdf/2004.07211.pdf)
+                loss += 0.5 * F.mse_loss(input=distill_output, target=prevoutput)
 
         # measure accuracy and record loss
         acc1, acc5 = accuracy(output, target, topk=(1, 5))
@@ -81,10 +71,6 @@ def train(opt, loader, model, optimizer, scheduler, logger, prevmodel=None, temp
         if opt.calibrator == 'WA': 
             torch.clamp(model.fc.weight, min=0)
 
-        # measure elapsed time
-        batch_time.update(time.time() - end)
-        end = time.time()
-
         if i % opt.print_freq == 0:
             progress.display(i + 1)
 
@@ -94,20 +80,17 @@ def train(opt, loader, model, optimizer, scheduler, logger, prevmodel=None, temp
 
 
 def validate(loader, model, logger):
-    batch_time = AverageMeter('Time', ':6.3f', Summary.NONE)
-    losses = AverageMeter('Loss', ':.4e', Summary.NONE)
     top1 = AverageMeter('Acc@1', ':6.2f', Summary.AVERAGE)
     top5 = AverageMeter('Acc@5', ':6.2f', Summary.AVERAGE)
     progress = ProgressMeter(logger,
         len(loader),
-        [batch_time, losses, top1, top5],
+        [top1, top5],
         prefix='Test: ')
 
     # switch to evaluate mode
     model.eval()
 
     with torch.no_grad():
-        end = time.time()
         for i, (images, target) in enumerate(loader):
             images = images.cuda(non_blocking=True)
             target = target.cuda(non_blocking=True)
@@ -118,26 +101,19 @@ def validate(loader, model, logger):
 
             # measure accuracy and record loss
             acc1, acc5 = accuracy(output, target, topk=(1, 5))
-            losses.update(loss.item(), images.size(0))
             top1.update(acc1[0], images.size(0))
             top5.update(acc5[0], images.size(0))
-
-            # measure elapsed time
-            batch_time.update(time.time() - end)
-            end = time.time()
 
     progress.display_summary()
     return
 
 
 def test(loader, model, logger):
-    batch_time = AverageMeter('Time', ':6.3f', Summary.NONE)
-    losses = AverageMeter('Loss', ':.4e', Summary.NONE)
     top1 = AverageMeter('Acc@1', ':6.2f', Summary.AVERAGE)
     top5 = AverageMeter('Acc@5', ':6.2f', Summary.AVERAGE)
     progress = ProgressMeter(logger,
         len(loader),
-        [batch_time, losses, top1, top5],
+        [top1, top5],
         prefix='Val: ')
 
     # switch to evaluate mode
@@ -145,7 +121,6 @@ def test(loader, model, logger):
 
     predsarr, labelsarr = None, None
     with torch.no_grad():
-        end = time.time()
         for i, (images, target) in enumerate(loader):
             images = images.cuda(non_blocking=True)
             
@@ -164,14 +139,9 @@ def test(loader, model, logger):
             
             # measure accuracy and record loss
             acc1, acc5 = accuracy(output, target, topk=(1, 5))
-            losses.update(loss.item(), images.size(0))
             top1.update(acc1[0], images.size(0))
             top5.update(acc5[0], images.size(0))
-            
-            # measure elapsed time
-            batch_time.update(time.time() - end)
-            end = time.time()
-    
+
     progress.display_summary()
     return predsarr, labelsarr
 
