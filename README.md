@@ -11,7 +11,7 @@ This repository contains the code for the paper:
 
 ## Getting started
 
-Running our code requires 1 80GB A100 GPU with Pytorch 2.0 but is backward compatible.
+Running our code requires 1 80GB A100 GPU with Pytorch 2.0.
 
 * Install all requirements required to run the code by:
  ```	
