@@ -45,7 +45,7 @@ BudgetCL/
 |–– LICENSE
 
 ```
-## Running a Model
+## Running the Code
 
 
 
