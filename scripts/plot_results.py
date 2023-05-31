@@ -1,5 +1,4 @@
-# Hasan-- can you modify this based on the plotting code used when we ran the final version?
-
+# Hasan-- can we modify this based on the plotting code used back when we ran the final version? I restored the basic class structure
 from re import L
 import numpy as np
 import matplotlib.pyplot as plt

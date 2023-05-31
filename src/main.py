@@ -108,7 +108,7 @@ if __name__ == '__main__':
     start=0
             
     for timestep in range(opt.num_timesteps):
-        opt.timestep = timestep+1
+        opt.timestep = timestep+1 # Note: opt.timestep starts from 1 and not 0.
         os.makedirs(opt.log_dir+'/'+opt.exp_name+'/'+str(opt.timestep)+'/', exist_ok=True)
 
         if opt.model_type == 'gdumb' or opt.timestep==1:

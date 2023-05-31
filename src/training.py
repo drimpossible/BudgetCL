@@ -146,7 +146,7 @@ def test(loader, model, logger):
     return predsarr, labelsarr
 
 
-def get_features(opt, loader, model, mode='features'):
+def save_representations(opt, loader, model, mode='features'):
     assert(mode in ['features', 'predictions'])
     X_arr, y_arr = None, None
 
