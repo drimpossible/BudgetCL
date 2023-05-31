@@ -10,7 +10,7 @@ from utils import get_logger
 from torch import nn
 import numpy as np
 from utils import LinearLR, seed_everything, save_model
-from training import train, test, save_representations
+from training import train, test, get_features
 import copy
 
 def per_timestep_loop(opt, logger, dataset):
@@ -48,7 +48,7 @@ def per_timestep_loop(opt, logger, dataset):
             model.fc.bias =  nn.Parameter(torch.cat((model.fc.bias, new_biases), dim=0))
     
     # model = torch.nn.DataParallel(model.cuda()) # Use Dataparallel for now if running on multiple GPUs -- need for distillation experiments if not wanting to store
-
+    model = model.cuda()
     optimizer = SGD(model.parameters(), lr=opt.maxlr, momentum=opt.momentum, weight_decay=opt.weight_decay)  
     scheduler = LinearLR(optimizer, T=opt.total_steps)
 
@@ -117,7 +117,7 @@ if __name__ == '__main__':
             opt.pretrain_modelpath = opt.log_dir+'/'+opt.exp_name+'/'+str(opt.timestep-1)+'/last.ckpt'
         assert(opt.model_type in ['normal', 'gdumb'])
         
-        dataset.get_next_timestep_dataloader()
+        dataset.get_next_timestep_dataloader(opt)
         opt.expand_size = dataset.expand_size
 
         if opt.dataset == 'CGLM':

@@ -40,16 +40,16 @@ class CLImageFolder(object):
             # We usually split the curr_paths into train and val, excluding pretrain data. Currently 0 new data as everything is pretraining.
             self.curr_paths, self.val_paths, self.test_paths, self.fulltest_paths, self.curr_labels, self.val_labels, self.test_labels, self.fulltest_labels = copy.deepcopy(self._pretrain_paths), copy.deepcopy(self._preval_paths), [], copy.deepcopy(self._cltest_paths), copy.deepcopy(self._pretrain_labels), copy.deepcopy(self._preval_labels), [], copy.deepcopy(self._cltest_labels)
             self.classweights = np.bincount(np.array(self.curr_labels))
-            assert(not torch.any(torch.eq(self.classweights, torch.zeros(self.classweights.size(0)))).item()), 'Class cannot have 0 samples'
+            assert(not torch.any(torch.eq(torch.from_numpy(self.classweights), torch.zeros(len(self.classweights)))).item()), 'Class cannot have 0 samples'
 
             # Each timestep will have its {train/val/test/mem}loader (timestep 0 won't have memloader)
             assert(len(self.curr_paths) > 0 and len(self.val_paths) > 0 and len(self._pretest_paths) > 0 and len(self.test_paths)==0), 'Path list cannot be empty'
             assert(len(self.curr_paths)==len(self.curr_labels) and len(self.val_paths)==len(self.val_labels) and len(self._pretest_paths)==len(self._pretest_labels) and len(self.fulltest_paths)==len(self.fulltest_labels))
             
-            self.trainloader = self.get_loader(paths=self.curr_paths, labels=self.curr_labels, train=True)
-            self.trainloader_eval = self.get_loader(paths=self.curr_paths, labels=self.curr_labels, train=False)
-            self.valloader = self.get_loader(paths=self.val_paths, labels=self.val_labels, train=False)
-            self.pretestloader = self.get_loader(paths=copy.deepcopy(self._pretest_paths), labels=copy.deepcopy(self._pretest_labels), train=False)
+            self.trainloader = self.get_loader(opt, paths=self.curr_paths, labels=self.curr_labels, train=True)
+            self.trainloader_eval = self.get_loader(opt, paths=self.curr_paths, labels=self.curr_labels, train=False)
+            self.valloader = self.get_loader(opt, paths=self.val_paths, labels=self.val_labels, train=False)
+            self.pretestloader = self.get_loader(opt, paths=copy.deepcopy(self._pretest_paths), labels=copy.deepcopy(self._pretest_labels), train=False)
             self.fulltestloader = DataLoader(ListFolder(data_dir= opt.data_dir, imgpaths=self.fulltest_paths, labels=self.fulltest_labels, transform=ClassificationPresetEval(crop_size=self.opt.crop_size, resize_size=self.opt.crop_size+32)), **self.kwargs)
             self.trainlen, self.vallen, self.pretestlen, self.fulltestlen = len(self.curr_paths), len(self.val_paths), len(self._pretest_paths), len(self.fulltest_paths)
         
@@ -124,7 +124,7 @@ class CLImageFolder(object):
 
         return trainimgs, valimgs, testimgs, trainlabels, vallabels, testlabels
 
-    def get_loader(self, paths, labels, train=True):
+    def get_loader(self, opt, paths, labels, train=True):
         # drop_last is False and shuffle is True while training, vice-versa in other cases (batchnorm cries if last batch has 1 sample)
         if train:
             self.kwargs['batch_size'] = self.opt.train_batch_size
@@ -138,7 +138,7 @@ class CLImageFolder(object):
         else:
             return DataLoader(ListFolder(data_dir= opt.data_dir, imgpaths=paths, labels=labels, transform=ClassificationPresetEval(crop_size=self.opt.crop_size, resize_size=self.opt.crop_size+32)), **self.kwargs)  
 
-    def get_next_timestep_dataloader(self):
+    def get_next_timestep_dataloader(self,opt):
         assert((self.opt.num_classes_per_timestep > 0 and self.opt.increment_size == 0) or (self.opt.num_classes_per_timestep == 0 and self.opt.increment_size > 0)), 'Either increment by class sizes or by constant number of samples'
         
         # Load new samples into the curr_paths -- either by incrementing per-class or per-sample (different as classes may have very unequal distribution of samples)
@@ -188,21 +188,21 @@ class CLImageFolder(object):
         
         if (not exists(self.opt.log_dir+'/'+self.opt.exp_name+'/'+str(self.opt.timestep+1)+'/last.ckpt')):
             self.classweights = np.bincount(np.array(self.curr_labels))
-            assert(not torch.any(torch.eq(self.classweights, torch.zeros(self.classweights.size(0)))).item()), 'Class cannot have 0 samples'
+            assert(not torch.any(torch.eq(torch.from_numpy(self.classweights), torch.zeros(len(self.classweights)))).item()), 'Class cannot have 0 samples'
             curr_paths, curr_labels = self.sample_data()
     
             # Each timestep will have its {train/val/test}loader
             if self.opt.dataset == 'Imagenet2K':
                 assert(len(self.curr_paths) > 0 and len(self.val_paths) > 0 and len(self.test_paths)>0), 'Path list cannot be empty'
-                self.trainloader = self.get_loader(paths=curr_paths, labels=curr_labels, train=True)
-                self.trainloader_eval = self.get_loader(paths=self.curr_paths, labels=self.curr_labels, train=False)
-                self.valloader = self.get_loader(paths=copy.deepcopy(self.val_paths), labels=copy.deepcopy(self.val_labels), train=False)
-                self.testloader =  self.get_loader(paths=copy.deepcopy(self.test_paths), labels=copy.deepcopy(self.test_labels), train=False)
+                self.trainloader = self.get_loader(opt, paths=self.curr_paths, labels=self.curr_labels, train=True)
+                self.trainloader_eval = self.get_loader(opt, paths=self.curr_paths, labels=self.curr_labels, train=False)
+                self.valloader = self.get_loader(opt, paths=copy.deepcopy(self.val_paths), labels=copy.deepcopy(self.val_labels), train=False)
+                self.testloader =  self.get_loader(opt, paths=copy.deepcopy(self.test_paths), labels=copy.deepcopy(self.test_labels), train=False)
                 self.trainlen, self.vallen, self.testlen = len(curr_paths), len(self.val_paths), len(self.test_paths)   
             elif self.opt.dataset == 'CGLM':
                 assert(len(curr_paths) > 0 and len(curr_labels)==len(curr_paths)), 'Path list cannot be empty'
-                self.trainloader = self.get_loader(paths=curr_paths, labels=curr_labels, train=True)
-                self.trainloader_eval = self.get_loader(paths=self.curr_paths, labels=self.curr_labels, train=False)
+                self.trainloader = self.get_loader(opt, paths=curr_paths, labels=curr_labels, train=True)
+                self.trainloader_eval = self.get_loader(opt, paths=self.curr_paths, labels=self.curr_labels, train=False)
                 self.trainlen = len(curr_paths)  
 
     def sample_data(self):
@@ -354,7 +354,7 @@ class ClassificationPresetEval:
 if __name__ == '__main__':
     # Test dataloading
     opt = opts.parse_args()
-    d = CLImageFolder(opt)
-    d.get_next_timestep_dataloader()
+    d = CLImageFolder(opt=opt)
+    d.get_next_timestep_dataloader(opt=opt)
     for (inputs, labels) in d.valloader:
         print(labels, inputs.size())

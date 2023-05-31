@@ -7,9 +7,10 @@ def parse_args():
    ## Paths
    parser.add_argument('--log_dir', type=str, default='../logs/', help='Full path to the directory where all logs are stored')
    parser.add_argument('--order_file_dir', type=str, default='../../order_files/', help='Full path to the ordering files')
+   parser.add_argument('--data_dir', type=str, default='', help='Path to dataset directory')
 
    ## Dataset
-   parser.add_argument('--dataset', type=str, default='Imagenet', choices=['Imagenet2K', 'CGLM'], help='Dataset used for CL')
+   parser.add_argument('--dataset', type=str, default='Imagenet2K', choices=['Imagenet2K', 'CGLM'], help='Dataset used for CL')
    parser.add_argument('--timestep', type=int, default=0, help='Timestep to start learning from (for resuming)')
    parser.add_argument('--train_batch_size', type=int, default=1500, help='Batch size to be used in training')
    parser.add_argument('--test_batch_size', type=int, default=1500, help='Batch size to be used in testing')
