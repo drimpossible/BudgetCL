@@ -1,7 +1,8 @@
 import torch, argparse, copy, random
 from torchvision.transforms import autoaugment, transforms
 from torchvision.transforms.functional import InterpolationMode
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader]
+from sampling import select_samples
 import numpy as np
 from training import train
 from PIL import Image
@@ -120,8 +121,7 @@ class CLImageFolder(object):
             assert(clsname in self._classes), 'Class '+str(clsname)+' not found!'
         fp.close()
 
-        assert(len(trainlabels)==len(trainimgs) and len(vallabels)==len(valimgs) and len(testlabels)==len(testimgs))  
-
+        assert(len(trainlabels)==len(trainimgs) and len(vallabels)==len(valimgs) and len(testlabels)==len(testimgs))
         return trainimgs, valimgs, testimgs, trainlabels, vallabels, testlabels
 
     def get_loader(self, paths, labels, train=True):
@@ -163,8 +163,6 @@ class CLImageFolder(object):
                 self.curr_classes.append(clsname)
                 newclasses.append(clsname)
         self.expand_size = len(newclasses)
-#        if self.opt.dset_mode == 'random': 
-            #assert(self.expand_size==0 or self.expand_size==1000)
 
         # Add val images for all the new classes
         if self.opt.dataset == 'Imagenet2K':
@@ -242,8 +240,8 @@ class CLImageFolder(object):
             elif self.opt.sampling_mode == 'uniform':
                 probabilities = np.ones(len(self.curr_labels))/len(self.curr_labels)
                 idxes = np.random.choice(range(0, probabilities.shape[0]), size=self.opt.total_steps*self.opt.train_batch_size, p=probabilities, replace=True)
-            # elif: ## These still being cleaned
-            #     idxes = calculate_max_sampling(opt=self.opt, num_samples=self.opt.total_steps*self.opt.train_batch_size, labels=self.curr_labels)
+            elif self.opt.sampling_mode in ['herding', 'kmeans', 'unc_lc', 'max_loss']: ## These still being cleaned
+                idxes = select_samples(opt=self.opt, num_samples=self.opt.total_steps*self.opt.train_batch_size, class_balanced=True) # Without class balancing performance is even crappier
                             
             curr_paths = np.copy(np.array(self.curr_paths))
             curr_labels = np.copy(np.array(self.curr_labels))
