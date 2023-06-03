@@ -72,9 +72,6 @@ def train(opt, loader, model, optimizer, scheduler, logger, prevmodel=None, temp
             if opt.calibrator == 'WA': 
                 torch.clamp(model.fc.weight, min=0)
 
-            if i % opt.print_freq == 0:
-                progress.display(i + 1)
-
             if i > ((opt.total_steps)):
                 return model, optimizer, scheduler
     return model, optimizer, scheduler

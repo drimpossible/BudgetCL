@@ -10,7 +10,7 @@ from utils import get_logger
 from torch import nn
 import numpy as np
 from utils import LinearLR, seed_everything, save_model
-from training import train, test, get_features
+from training import train, test, save_representations
 import copy
 
 def per_timestep_loop(opt, logger, dataset):

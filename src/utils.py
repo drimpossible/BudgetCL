@@ -162,7 +162,8 @@ def save_model(opt, model):
     Saves the model along with opts (for reference), useful for fixing intermediate breaks while running the code.
     '''
     state = {'opt': opt,
-        'state_dict': model.module.state_dict()}
+        'state_dict': model.state_dict()} # Add .module to model if using DataParallel
+
     filename = opt.log_dir+'/'+opt.exp_name+'/'+str(opt.timestep)+'/last.ckpt'
     torch.save(state, filename)
         
