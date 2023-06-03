@@ -3,7 +3,7 @@
 This repository contains the code for the paper:
 
 **Computationally Budgeted Continual Learning: What Does Matter?, CVPR 2023**  
-[Ameya Prabhu*](https://drimpossible.github.io), [Hasan Abed Al Kader Hammoud*](https://github.com/hammoudhasan), [Puneet Dokania](https://puneetkdokania.github.io), [Philip Torr](https://www.robots.ox.ac.uk/~phst/), [Ser-Nam Lim](https://sites.google.com/site/sernam), [Bernard Ghanem](https://www.bernardghanem.com/), [Adel Bibi](https://www.adelbibi.com/)
+[Ameya Prabhu*](https://drimpossible.github.io), [Hasan Abed Al Kader Hammoud*](https://scholar.google.com/citations?user=Plf1JSIAAAAJ&hl=en&oi=ao), [Puneet Dokania](https://puneetkdokania.github.io), [Philip Torr](https://www.robots.ox.ac.uk/~phst/), [Ser-Nam Lim](https://sites.google.com/site/sernam), [Bernard Ghanem](https://www.bernardghanem.com/), [Adel Bibi](https://www.adelbibi.com/)
 
 [[Arxiv](https://arxiv.org/abs/2303.11165)]
 [[PDF](https://github.com/drimpossible/drimpossible.github.io/raw/master/documents/BudgetCL.pdf)]
@@ -11,7 +11,7 @@ This repository contains the code for the paper:
 
 ## Getting started
 
-Running our code requires 1 80GB A100 GPU with Pytorch 2.0.
+Running our code requires 1x80GB A100 GPU with PyTorch 1.13.
 
 * Install all requirements required to run the code by:
  ```	
@@ -46,6 +46,31 @@ BudgetCL/
 
 ```
 ## Running the Code
+
+Below we provide a sample for running our code. The example below reproduces our main Uniform sampling experiment results on ImageNet2K. 
+
+```
+python main.py --log_dir='../sampling_exps/' \
+              --order_file_dir=../data/clim2k/order_files/ \
+              --train_batch_size 1500 \
+              --test_batch_size 1500 \
+              --crop_size 224 \
+              --dset_mode='class_incremental' \
+              --num_classes_per_timestep=50 \
+              --num_timesteps=20 \
+              --increment_size=0 \
+              --optimizer="SGD" \
+              --model='resnet50' \
+              --sampling_mode='uniform' \
+              --model_type='normal' \
+              --maxlr=0.1 \
+              --total_steps=400 \
+              --seed=1 \
+              --weight_decay=0 \
+              --clip=2.0 \
+              --num_workers=8 \
+              --momentum 0.9
+```
 
 
 
