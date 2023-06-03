@@ -1,9 +1,12 @@
-import torch, os
+import os
+
+import numpy as np
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models.feature_extraction import create_feature_extractor
-from utils import AverageMeter, ProgressMeter, accuracy, Summary
-import numpy as np
+
+from utils import AverageMeter, ProgressMeter, Summary, accuracy
 
 
 def train(opt, loader, model, optimizer, scheduler, logger, prevmodel=None, temperature=2.0):

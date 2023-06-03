@@ -3,6 +3,7 @@ import torch
 from sklearn.cluster import KMeans
 from torch.nn import functional as F
 
+
 def select_samples(opt, num_samples, class_balanced=False):
     if opt.timestep>1:
         if not class_balanced:

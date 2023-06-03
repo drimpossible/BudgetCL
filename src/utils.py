@@ -1,10 +1,14 @@
+import logging
+import os
 import random
-import torch, logging, os
+from enum import Enum
+
 import numpy as np
+import torch
+import torch.distributed as dist
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer, required
-from enum import Enum
-import torch.distributed as dist
+
 
 class LinearLR(_LRScheduler):
     r"""Set the learning rate of each parameter group with a linear
@@ -32,8 +36,8 @@ class LinearLR(_LRScheduler):
         super(LinearLR, self).__init__(optimizer, last_epoch)
 
     def get_lr(self):
-        rate = 1 - (self.last_epoch/self.T)
-        return [rate*base_lr for base_lr in self.base_lrs]
+        rate = 1 - (self.last_epoch / self.T)
+        return [rate * base_lr for base_lr in self.base_lrs]
 
     def _get_closed_form_lr(self):
         return self.get_lr()
@@ -45,8 +49,10 @@ class Summary(Enum):
     SUM = 2
     COUNT = 3
 
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self, name, fmt=':f', summary_type=Summary.AVERAGE):
         self.name = name
         self.fmt = fmt
@@ -72,7 +78,9 @@ class AverageMeter(object):
             device = torch.device("mps")
         else:
             device = torch.device("cpu")
-        total = torch.tensor([self.sum, self.count], dtype=torch.float32, device=device)
+        total = torch.tensor([self.sum, self.count],
+                             dtype=torch.float32,
+                             device=device)
         dist.all_reduce(total, dist.ReduceOp.SUM, async_op=False)
         self.sum, self.count = total.tolist()
         self.avg = self.sum / self.count
@@ -80,7 +88,7 @@ class AverageMeter(object):
     def __str__(self):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
-    
+
     def summary(self):
         fmtstr = ''
         if self.summary_type is Summary.NONE:
@@ -93,11 +101,12 @@ class AverageMeter(object):
             fmtstr = '{name} {count:.3f}'
         else:
             raise ValueError('invalid summary type %r' % self.summary_type)
-        
+
         return fmtstr.format(**self.__dict__)
 
 
 class ProgressMeter(object):
+
     def __init__(self, logger, num_batches, meters, prefix=""):
         self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
         self.meters = meters
@@ -108,7 +117,7 @@ class ProgressMeter(object):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
         self.logger.info('\t'.join(entries))
-        
+
     def display_summary(self):
         entries = [" *"]
         entries += [meter.summary() for meter in self.meters]
@@ -120,7 +129,7 @@ class ProgressMeter(object):
         return '[' + fmt + '/' + fmt.format(num_batches) + ']'
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(output, target, topk=(1, )):
     """Computes the accuracy over the k top predictions for the specified values of k"""
     with torch.no_grad():
         maxk = max(topk)
@@ -141,7 +150,8 @@ def get_logger(folder):
     # global logger
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("[%(asctime)s] %(levelname)s:%(name)s:%(message)s")
+    formatter = logging.Formatter(
+        "[%(asctime)s] %(levelname)s:%(name)s:%(message)s")
     # file logger
     if not os.path.isdir(folder):
         os.makedirs(folder)
@@ -161,13 +171,16 @@ def save_model(opt, model):
     '''
     Saves the model along with opts (for reference), useful for fixing intermediate breaks while running the code.
     '''
-    state = {'opt': opt,
-        'state_dict': model.state_dict()} # Add .module to model if using DataParallel
+    state = {
+        'opt': opt,
+        'state_dict': model.state_dict()
+    }  # Add .module to model if using DataParallel
 
-    filename = opt.log_dir+'/'+opt.exp_name+'/'+str(opt.timestep)+'/last.ckpt'
+    filename = opt.log_dir + '/' + opt.exp_name + '/' + str(
+        opt.timestep) + '/last.ckpt'
     torch.save(state, filename)
-        
-    
+
+
 def seed_everything(seed):
     '''
     Fixes the class-to-task assignments and most other sources of randomness, except CUDA training aspects.
@@ -179,4 +192,4 @@ def seed_everything(seed):
     np.random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
     if torch.cuda.is_available():
-        torch.backends.cudnn.benchmark = True # An exemption for speed :P
+        torch.backends.cudnn.benchmark = True  # An exemption for speed :P
