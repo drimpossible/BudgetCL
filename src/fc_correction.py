@@ -12,6 +12,21 @@ from utils import AverageMeter, ProgressMeter, accuracy
 
 
 class CosineLinear(nn.Module):
+    """
+    A PyTorch module for a linear layer with cosine similarity.
+
+    Args:
+        in_features (int): The number of input features.
+        out_features (int): The number of output features.
+        sigma (bool): Whether to include a learnable scaling factor.
+
+    Attributes:
+        in_features (int): The number of input features.
+        out_features (int): The number of output features.
+        weight (nn.Parameter): The learnable weight tensor.
+        bias (None): This module does not use a bias.
+        sigma (Optional[nn.Parameter]): The learnable scaling factor tensor.
+    """
 
     def __init__(self, in_features, out_features, sigma=True):
         super(CosineLinear, self).__init__()
@@ -39,7 +54,10 @@ class CosineLinear(nn.Module):
 
 class Temperature(torch.nn.Module):
     """
-    temperature scaling for calibration
+    A PyTorch module for temperature scaling during calibration.
+
+    Attributes:
+        temperature (nn.Parameter): The learnable temperature scaling factor.
     """
 
     def __init__(self):
@@ -47,12 +65,29 @@ class Temperature(torch.nn.Module):
         self.temperature = nn.Parameter(torch.ones(1) * 1.5)
 
     def forward(self, logits):
+        """
+        Applies temperature scaling to the logits.
+
+        Args:
+            logits (torch.Tensor): The input logits.
+
+        Returns:
+            torch.Tensor: The logits after temperature scaling.
+        """
         return logits / self.temperature
 
 
 class BiC(nn.Module):
     """
-    Bias adjustment for the new classes -- splits logits into old and new, calibrates the new and the merges
+    A PyTorch module for bias adjustment of new classes in a classification model.
+
+    Args:
+        num_new_cls (int): The number of new classes to adjust the bias for.
+
+    Attributes:
+        alpha (nn.Parameter): The learnable scaling factor for the new classes.
+        beta (nn.Parameter): The learnable bias term for the new classes.
+        num_new_cls (int): The number of new classes to adjust the bias for.
     """
 
     def __init__(self, num_new_cls):
@@ -62,6 +97,15 @@ class BiC(nn.Module):
         self.num_new_cls = num_new_cls
 
     def forward(self, logits):
+        """
+        Adjusts the bias of the new classes in the logits.
+
+        Args:
+            logits (torch.Tensor): The input logits.
+
+        Returns:
+            torch.Tensor: The logits with adjusted bias for the new classes.
+        """
         extra = logits.size(1) - self.num_new_cls
         old, new = logits[:, :extra], logits[:, extra:]
         new = self.alpha * new + self.beta
@@ -70,6 +114,22 @@ class BiC(nn.Module):
 
 
 def correct_weights(model, valloader, calibration_method, logger, expand_size):
+    """
+    Corrects the weights of the fully connected layer in a PyTorch model according to the WA calibration method.
+
+    Args:
+        model (nn.Module): The PyTorch model to correct the weights for.
+        valloader (DataLoader): The validation data loader.
+        calibration_method (str): The calibration method to use.
+        logger (Logger): The logger object for logging.
+        expand_size (int): The number of new classes to expand the model for.
+
+    Raises:
+        AssertionError: If `expand_size` is 0.
+
+    Returns:
+        None
+    """
     # Weights corrected according to: Maintaining Discrimination and Fairness in Class Incremental Learning (https://arxiv.org/pdf/1911.07053.pdf)
     if calibration_method == 'WA':
         assert (expand_size != 0)
@@ -145,6 +205,20 @@ def correct_weights(model, valloader, calibration_method, logger, expand_size):
 
 
 def calibrate(loader, model, calibrator, optimizer, logger, epoch):
+    """
+    Calibrates a PyTorch model using a given calibrator module and optimizer.
+
+    Args:
+        loader (DataLoader): The data loader for calibration.
+        model (nn.Module): The PyTorch model to calibrate.
+        calibrator (nn.Module): The PyTorch module to use for calibration.
+        optimizer (Optimizer): The optimizer to use for calibration.
+        logger (Logger): The logger object for logging.
+        epoch (int): The current epoch number.
+
+    Returns:
+        Tuple[nn.Module, Optimizer]: The calibrated model and optimizer.
+    """
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')

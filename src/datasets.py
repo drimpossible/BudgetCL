@@ -410,6 +410,23 @@ class CLImageFolder(object):
 
 
 class ListFolder(Dataset):
+    """
+    A PyTorch Dataset class for loading images from a list of file paths.
+
+    Args:
+        data_dir (str): The path to the directory containing the images.
+        imgpaths (List[str]): A list of file paths to the images.
+        labels (List[int]): A list of labels for the images.
+        transform (Optional[Callable]): A function to apply to the images.
+        return_paths (bool): Whether to return the image paths along with the images.
+
+    Attributes:
+        data_dir (str): The path to the directory containing the images.
+        image_paths (List[str]): A list of file paths to the images.
+        labels (torch.Tensor): A tensor of labels for the images.
+        transform (Optional[Callable]): A function to apply to the images.
+        return_paths (bool): Whether to return the image paths along with the images.
+    """
 
     def __init__(self,
                  data_dir,
@@ -445,6 +462,15 @@ class ListFolder(Dataset):
 
 
 def pil_loader(path):
+    """
+    Opens an image file at the given path and returns a PIL image object.
+
+    Args:
+        path (str): The path to the image file.
+
+    Returns:
+        PIL.Image.Image: The image object in RGB format.
+    """
     # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
     with open(path, 'rb') as f:
         img = Image.open(f)
@@ -452,6 +478,21 @@ def pil_loader(path):
 
 
 class ClassificationPresetTrain:
+    """
+    A PyTorch transform class for preprocessing images during training for classification.
+
+    Args:
+        crop_size (int): The size to crop the image to.
+        mean (Tuple[float, float, float]): The mean values for normalization.
+        std (Tuple[float, float, float]): The standard deviation values for normalization.
+        interpolation (InterpolationMode): The interpolation mode for resizing the image.
+        hflip_prob (float): The probability of horizontally flipping the image.
+        auto_augment_policy (Optional[str]): The policy to use for auto-augmentation.
+        random_erase_prob (float): The probability of randomly erasing part of the image.
+
+    Attributes:
+        transforms (Compose): A PyTorch Compose object containing the image transforms.
+    """
 
     def __init__(self,
                  crop_size,
@@ -497,6 +538,19 @@ class ClassificationPresetTrain:
 
 
 class ClassificationPresetEval:
+    """
+    A PyTorch transform class for preprocessing images during evaluation for classification.
+
+    Args:
+        crop_size (int): The size to crop the image to.
+        resize_size (int): The size to resize the image to.
+        mean (Tuple[float, float, float]): The mean values for normalization.
+        std (Tuple[float, float, float]): The standard deviation values for normalization.
+        interpolation (InterpolationMode): The interpolation mode for resizing the image.
+
+    Attributes:
+        transforms (Compose): A PyTorch Compose object containing the image transforms.
+    """
 
     def __init__(
             self,
