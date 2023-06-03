@@ -1,5 +1,7 @@
 # BudgetCL (Still under construction-- will be ready before May End)
-![pull](https://github.com/drimpossible/BudgetCL/assets/74360386/5af6d831-a8ea-40f9-a213-15855fc9d509)
+<p align="center">
+  <img src="https://github.com/drimpossible/BudgetCL/assets/74360386/5af6d831-a8ea-40f9-a213-15855fc9d509" width="500" alt="pull">
+</p>
 
 This repository contains the code for the paper:
 
