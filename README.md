@@ -1,4 +1,4 @@
-# BudgetCL (Still under construction-- will be ready before May End)
+# BudgetCL 
 <p align="center">
   <img src="https://github.com/drimpossible/BudgetCL/assets/74360386/5af6d831-a8ea-40f9-a213-15855fc9d509" width="500" alt="pull">
 </p>
@@ -22,10 +22,11 @@ Running our code requires 1x80GB A100 GPU with PyTorch 1.13.
 $ pip3 install -r requirements.txt
  ```
 
-## Setting up the Datasets
+## Setting up the Datasets (Instructions TBA, latest by June 8th)
 
 ### Continual-ImageNet2K (CL-ImageNet2K)
 
+Instructions TBA
 
 ### Continual Google Landmarks V2 (CGLM)
 
