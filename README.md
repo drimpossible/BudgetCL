@@ -1,7 +1,4 @@
 # BudgetCL 
-<p align="center">
-  <img src="https://github.com/drimpossible/BudgetCL/assets/74360386/5af6d831-a8ea-40f9-a213-15855fc9d509" width="500" alt="pull">
-</p>
 
 This repository contains the code for the paper:
 
@@ -12,29 +9,45 @@ This repository contains the code for the paper:
 [[PDF](https://github.com/drimpossible/drimpossible.github.io/raw/master/documents/BudgetCL.pdf)]
 [[Bibtex](https://github.com/drimpossible/BudgetCL/#citation)]
 
+<p align="center">
+  <img src="https://github.com/drimpossible/BudgetCL/assets/74360386/5af6d831-a8ea-40f9-a213-15855fc9d509" width="250" alt="Figure which describes our conclusions">
+</p>
+
 ## Getting started
 
 Running our code requires 1x80GB A100 GPU with PyTorch 1.13.
 
-* Install all requirements required to run the code by:
+- Install all requirements required to run the code by:
  ```	
 # First, activate a new virtual environment
-$ pip3 install -r requirements.txt
+$ pip install -r requirements.txt
  ```
 
-## Setting up the Datasets (Instructions TBA, latest by June 8th)
+## Setting up the Datasets
 
-### Continual-ImageNet2K (CL-ImageNet2K)
+-  We provide a fast, direct mechanism to download and use our datasets in [this repository](https://github.com/hammoudhasan/CLDatasets).
 
-Instructions TBA
+## Reproducing the dataset creation
 
+### ImageNet2K (ImageNet2K)
+
+ImageNet2K is a dataset introduced by us, consists of 1K classes from the original dataset and 1K additional classes from ImageNet21K.
+
+- Download ImageNet1K `train` and `val` set from [here](https://www.image-net.org/download.php). Rename them as `train` and `test` set respectively.
+- Download ImageNetV2 dataset from [here](https://huggingface.co/datasets/vaishaal/ImageNetV2/resolve/main/imagenetv2-matched-frequency.tar.gz), and rename it as `val` set.
+- Download ImageNet21K dataset from this [webpage](https://www.image-net.org/download.php).
+
+Now, to select the subset of ImageNet21K dataset for inclusion, go to scripts and run the script `split_imagenet21k.py` as follows:
+`python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K 1000 750 ../clim2k/`
+ 
 ### Continual Google Landmarks V2 (CGLM)
 
-To download this dataset, please follow instructions from [ACM](https://github.com/drimpossible/ACM) repository.
+- This dataset was introduced in [ACM](https://github.com/drimpossible/ACM), please follow instructions in that repository for curation details.
 
 ### Directory structure
 
-After setting up the datasets and the environment, the project root folder should look like this:
+- After setting up the datasets and the environment, the project root folder should look like this:
+
 ```
 BudgetCL/
 |–– data/
@@ -54,7 +67,7 @@ BudgetCL/
 Below we provide a sample for running our code. The example below reproduces our main Uniform sampling experiment results on ImageNet2K. 
 
 ```
-python main.py --log_dir='../sampling_exps/' \
+python main.py --log_dir='../logs/sampling/' \
               --order_file_dir=../data/clim2k/order_files/ \
               --train_batch_size 1500 \
               --test_batch_size 1500 \
@@ -76,13 +89,15 @@ python main.py --log_dir='../sampling_exps/' \
               --momentum 0.9
 ```
 
-
-
 ## Reproducing All Experiments
 
 - TBA
 
 ##### If you discover any bugs in the code please contact me, I will cross-check them with my nightmares.
+
+Discovered mistakes:
+
+- ACE Loss implemented by us deviated from the original work. The correct ACE loss function is unsuitable for our setting along with uniform sampling, being practically equivalent to CrossEntropy. However, we shall include the deviated ACE loss function in our code repository as it gave interesting results on CGLM and DI-ImageNet2K.
 
 ## Citation
 
