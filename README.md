@@ -34,18 +34,21 @@ $ pip install -r requirements.txt
 
 ImageNet2K is a dataset introduced by us, consists of 1K classes from the original dataset and 1K additional classes from ImageNet21K.
 
-- Download ImageNet1K `train` and `val` set from [here](https://www.image-net.org/download.php). Rename them as `train` and `test` set respectively.
-- Download ImageNetV2 dataset from [here](https://huggingface.co/datasets/vaishaal/ImageNetV2/resolve/main/imagenetv2-matched-frequency.tar.gz), and rename it as `val` set.
+To create ImageNet2K dataset: 
+- Download ImageNet1K `train` and `val` set from [here](https://www.image-net.org/download.php). Copy them to the `ImageNet2K` folder in `train` and `test` subdirectories respectively.
+- Download ImageNetV2 dataset from [here](https://huggingface.co/datasets/vaishaal/ImageNetV2/resolve/main/imagenetv2-matched-frequency.tar.gz), and copy this to the `ImageNet2K` folder as `val` subdirectory.
 - Download ImageNet21K dataset from this [webpage](https://www.image-net.org/download.php).
 
 Now, to select the subset of ImageNet21K dataset for inclusion, go to scripts and run the script `split_imagenet21k.py` as follows:
 ```
-python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K 1000 750 ../clim2k/
+python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K PATH_TO_IMAGENET2K 1000 750 ../clim2k/
 ```
  
 ### Continual Google Landmarks V2 (CGLM)
 
 - This dataset was introduced in [ACM](https://github.com/drimpossible/ACM), please follow instructions in that repository for curation details.
+
+Note that the `test` set consists of all samples introduced so far, hence is static in the `data_incremental` setting. 
 
 ### Directory structure
 
@@ -91,9 +94,35 @@ python main.py --log_dir='../logs/sampling/' \
               --momentum 0.9
 ```
 
+Arguments you can tweak for your new cool CL pipeline/formulation/method:
+- Model (`--model`)
+- Dataset (`--order_file_dir`)
+- Total optimization steps changing the compute budget (`--total_steps`)
+
+To vary the number of timesteps change:
+
+In DI-ImageNet2K and CGLM:
+- Number of samples per timestep (`--num_samples_per_timestep`)
+
+In CI-ImageNet2K, increase one and decrease the other:
+- Number of classes per timestep (`--num_classes_per_timestep`)
+- Number of tasks (`--num_timesteps`)
+    
+
+### Extension to New Datasets
+
+- Create `train.txt`, `val.txt` and `test.txt` data orders for your new dataset.
+- Add the dataset details in `src/datasets.py`
+- Add the dataset folder name exactly to `src/opts.py`
+- Run you model with `--dataset your_fav_dataset`!
+
 ## Reproducing All Experiments
 
+To replicate the complete set of experiments, copy `scripts/replicate.sh` to `src/` and run with substituting $SEED with {0,1,2}:
+
 - TBA
+
+
 
 ##### If you discover any bugs in the code please contact me, I will cross-check them with my nightmares.
 
