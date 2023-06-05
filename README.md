@@ -26,6 +26,7 @@ $ pip install -r requirements.txt
 ## Setting up the Datasets
 
 -  We provide a fast, direct mechanism to download and use our datasets in [this repository](https://github.com/hammoudhasan/CLDatasets).
+-  Input the directory where the dataset was downloaded into `data_dir` field in `src/opts.py`.
 
 ## Reproducing the dataset creation
 
@@ -38,7 +39,9 @@ ImageNet2K is a dataset introduced by us, consists of 1K classes from the origin
 - Download ImageNet21K dataset from this [webpage](https://www.image-net.org/download.php).
 
 Now, to select the subset of ImageNet21K dataset for inclusion, go to scripts and run the script `split_imagenet21k.py` as follows:
-`python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K 1000 750 ../clim2k/`
+```
+python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K 1000 750 ../clim2k/
+```
  
 ### Continual Google Landmarks V2 (CGLM)
 
@@ -54,17 +57,16 @@ BudgetCL/
 |–––– cglm/
 |–––– clim2k/
 |–– src/
-|–––– clean.sh
 |–– scripts/
 |–– README.md
 |–– requirements.txt
 |–– .gitignore
 |–– LICENSE
-
 ```
-## Running the Code
 
-Below we provide a sample for running our code. The example below reproduces our main Uniform sampling experiment results on ImageNet2K. 
+## Usage
+
+To run any model specified in the paper one needs to simply modify the arguments, an example command below (reproduces our Naive baseline on CI-ImageNet2K):
 
 ```
 python main.py --log_dir='../logs/sampling/' \
