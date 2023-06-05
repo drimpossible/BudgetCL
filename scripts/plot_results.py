@@ -7,7 +7,6 @@ import numpy as np
 
 
 class Plotter():
-
     def __init__(self, xlabel, ylabel, title, y_in_log=False):
         self.xlabel = xlabel
         self.ylabel = ylabel
@@ -84,12 +83,12 @@ def get_accs(expdir, timesteps):
     return x, pretestacc, cltestacc, totacc
 
 
-DATADIR = '/Users/ameyapan/BIGILBench_Results/sampling_exps/'
+LOGDIR = 'YOUR_LOGDIR'
 linecolours = [
     'r', 'b', 'k', 'm', 'darkorange', 'g', 'y', 'c', 'olive', 'lime'
 ]
 
-x, preacc, clacc, totacc = get_accs(expdir=DATADIR +
+x, preacc, clacc, totacc = get_accs(expdir=LOGDIR +
                                     '/CLSINC_Uniform_3000_0.1/',
                                     timesteps=20)
 plter.add_plot(x=x,
