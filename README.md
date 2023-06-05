@@ -30,7 +30,7 @@ $ pip install -r requirements.txt
 
 ## Reproducing the dataset creation
 
-### ImageNet2K (ImageNet2K)
+### ImageNet2K
 
 ImageNet2K is a dataset introduced by us, consists of 1K classes from the original dataset and 1K additional classes from ImageNet21K.
 
