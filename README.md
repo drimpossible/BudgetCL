@@ -28,7 +28,7 @@ $ pip install -r requirements.txt
 -  We provide a fast, direct mechanism to download and use our datasets in [this repository](https://github.com/hammoudhasan/CLDatasets).
 -  Input the directory where the dataset was downloaded into `data_dir` field in `src/opts.py`.
 
-## Reproducing the dataset creation
+## Recreating the dataset
 
 ### ImageNet2K
 
@@ -38,17 +38,18 @@ To create ImageNet2K dataset:
 - Download ImageNet1K `train` and `val` set from [here](https://www.image-net.org/download.php). Copy them to the `ImageNet2K` folder in `train` and `test` subdirectories respectively.
 - Download ImageNetV2 dataset from [here](https://huggingface.co/datasets/vaishaal/ImageNetV2/resolve/main/imagenetv2-matched-frequency.tar.gz), and copy this to the `ImageNet2K` folder as `val` subdirectory.
 - Download ImageNet21K dataset from this [webpage](https://www.image-net.org/download.php).
+- Now, to select the subset of ImageNet21K dataset and generate ordering files, go to `scripts` and run the script:
+```
+python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K 1000 1200 ../clim2k/
+```
+- Finally, copy the new files from Imagenet21K to be included in ImageNet2K over to the folder by running:
+```
+python copy_imnet21k_to_imnet2k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET2K ../clim2k/
+```
 
-Now, to select the subset of ImageNet21K dataset for inclusion, go to scripts and run the script `split_imagenet21k.py` as follows:
-```
-python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K PATH_TO_IMAGENET2K 1000 750 ../clim2k/
-```
- 
 ### Continual Google Landmarks V2 (CGLM)
 
 - This dataset was introduced in [ACM](https://github.com/drimpossible/ACM), please follow instructions in that repository for curation details.
-
-Note that the `test` set consists of all samples introduced so far, hence is static in the `data_incremental` setting. 
 
 ### Directory structure
 
@@ -116,9 +117,9 @@ In CI-ImageNet2K, increase one and decrease the other:
 - Add the dataset folder name exactly to `src/opts.py`
 - Run you model with `--dataset your_fav_dataset`!
 
-## Reproducing All Experiments
+## Reproducing Results
 
-To replicate the complete set of experiments, copy `scripts/replicate.sh` to `src/` and run with substituting $SEED with {0,1,2}:
+To replicate the complete set of experiments, 
 
 - TBA
 
