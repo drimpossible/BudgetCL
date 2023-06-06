@@ -1,16 +1,11 @@
 import os, shutil
 
-IMNET2K_DIR = '../ImageNet2K/'
-IMNET21K_DIR = '../ImageNet21k/'
-ORDER_FILE_DIR = './'
+IMNET2K_DIR = 'ADD_DIR_HERE'
+IMNET21K_DIR = 'ADD_DIR_HERE'
+ORDER_FILE_DIR = 'ADD_DIR_HERE'
 
 f = open(ORDER_FILE_DIR+'/class_order.txt', 'r')
 lines = f.readlines()
-
-# for line in lines:
-#     os.removedirs(IMNET2K_DIR+'train/'+line)
-#     os.removedirs(IMNET2K_DIR+'val/'+line)
-#     os.removedirs(IMNET2K_DIR+'test/'+line)
 
 for line in lines:
     os.makedirs(IMNET2K_DIR+'train/'+line.strip(), exist_ok=True)
