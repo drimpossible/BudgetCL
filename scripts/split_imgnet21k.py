@@ -1,7 +1,7 @@
 # python split_imgnet21k.py <full path to imagenet21k extracted folder> <full path to imagenet1k folder> <num_classes> <imgs_per_cls_threshold>
-# Reproduce ours by: python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K PATH_TO_IMAGENET2K 1000 750 ../clim2k/
+# Reproduce ours by: python select_subset_imagenet21k.py PATH_TO_IMAGENET21K PATH_TO_IMAGENET1K 1000 1200 ../clim2k/
 
-import copy, os, random, shutil, sys
+import copy, os, random, sys
 from os.path import isdir, isfile, join
 import numpy as np
 
@@ -9,42 +9,41 @@ random.seed(0)
 os.environ['PYTHONHASHSEED'] = str(0)
 
 imnet21k_dir = sys.argv[1]
-save_dir = sys.argv[6]
-classes = [f for f in os.listdir(root_dir) if isdir(join(root_dir, f))]
+save_dir = sys.argv[5]
+classes = [f for f in os.listdir(imnet21k_dir) if isdir(join(imnet21k_dir, f))]
 cnt = 0
 class_sizes, class_order, cls_list = [], [], []
 order1, order2 = [], []
 pretrainf, prevalf, pretestf, valf, testf = [], [], [], [], []
 
 imnet1k_train_dir_1k = sys.argv[2] + '/train/'
-imnet1k_val_dir_1k = sys.argv[2] + '/test/'
-imnet1k_test_dir_1k = sys.argv[2] + '/val/'
-imnet2k_dir = sys.argv[3]
+imnet1k_val_dir_1k = sys.argv[2] + '/val/'
+imnet1k_test_dir_1k = sys.argv[2] + '/test/'
 
 classes_1k = [
-    f for f in os.listdir(root_dir_1k) if isdir(join(root_dir_1k, f))
+    f for f in os.listdir(imnet1k_train_dir_1k) if isdir(join(imnet1k_train_dir_1k, f))
 ]
 
 for cls in classes_1k:
-    folder = join(root_train_dir_1k, cls)
+    folder = join(imnet1k_train_dir_1k, cls)
     imgs = [
-        imnet2k_dir + '/' + cls + '/' + f for f in os.listdir(folder)
+        '/train/' + cls + '/' + f for f in os.listdir(folder)
         if (isfile(join(folder, f)))
     ]
     pretrainf.extend(imgs)
 
 for cls in classes_1k:
-    folder = join(root_val_dir_1k, cls)
+    folder = join(imnet1k_val_dir_1k, cls)
     imgs = [
-        imnet2k_dir + '/' + cls + '/' + f for f in os.listdir(folder)
+       '/val/' + cls + '/' + f for f in os.listdir(folder)
         if (isfile(join(folder, f)))
     ]
     prevalf.extend(imgs)
 
 for cls in classes_1k:
-    folder = join(root_test_dir_1k, cls)
+    folder = join(imnet1k_test_dir_1k, cls)
     imgs = [
-        imnet2k_dir + '/' + cls + '/' + f for f in os.listdir(folder)
+        '/test/' + cls + '/' + f for f in os.listdir(folder)
         if (isfile(join(folder, f)))
     ]
     pretestf.extend(imgs)
@@ -60,16 +59,18 @@ classes_1k.extend(problematic)
 for cls in classes:
     folder = join(imnet21k_dir, cls)
     imgs = [
-        imnet2k_dir + '/' + cls + '/' + f for f in os.listdir(folder)
+        cls + '/' + f for f in os.listdir(folder)
         if (isfile(join(folder, f)))
     ]
-    if len(imgs) < int(sys.argv[5]) or cls in classes_1k:
+
+    if len(imgs) < int(sys.argv[4]) or cls in classes_1k:
         pass
     else:
         cnt += 1
-        if cnt > int(sys.argv[4]): break
+        if cnt > int(sys.argv[3]): break
         cls_list.extend([cls])
         random.shuffle(imgs)
+
         testf.extend(imgs[:50])
         valf.extend(imgs[50:60])
         order1.extend(imgs[60:])
@@ -99,22 +100,22 @@ f.close()
 
 f = open(save_dir + '/class_incremental_ordering.txt', 'w')
 for line in order1:
-    f.write(line + '\n')
+    f.write('/train/'+line + '\n')
 f.close()
 
 f = open(save_dir + '/data_incremental_ordering.txt', 'w')
 for line in order2:
-    f.write(line + '\n')
+    f.write('/train/'+line + '\n')
 f.close()
 
 f = open(save_dir + '/val.txt', 'w')
 for line in valf:
-    f.write(line + '\n')
+    f.write('/val/'+line + '\n')
 f.close()
 
 f = open(save_dir + '/test.txt', 'w')
 for line in testf:
-    f.write(line + '\n')
+    f.write('/test/'+line + '\n')
 f.close()
 
 f = open(save_dir + '/class_order.txt', 'w')
