@@ -1,8 +1,8 @@
 import os, shutil
 
-IMNET2K_DIR = 'ADD_DIR_HERE'
-IMNET21K_DIR = 'ADD_DIR_HERE'
-ORDER_FILE_DIR = 'ADD_DIR_HERE'
+IMNET21K_DIR = sys.argv[1]
+IMNET2K_DIR = sys.argv[2]
+ORDER_FILE_DIR = sys.argv[3]
 
 f = open(ORDER_FILE_DIR+'/class_order.txt', 'r')
 lines = f.readlines()
