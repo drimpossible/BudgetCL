@@ -57,7 +57,7 @@ class CLImageFolder(object):
                 '.txt',
                 valpath=opt.order_file_dir + '/val.txt',
                 testpath=opt.order_file_dir + '/test.txt')
-            self.class_sizes = np.load(opt.order_file_dir + '/class_sizes.npy')
+            self.class_sizes = np.load('../scripts/class_sizes.npy')
 
             # We usually split the curr_paths into train and val, excluding pretrain data. Currently 0 new data as everything is pretraining.
             self.curr_paths, self.val_paths, self.test_paths, self.fulltest_paths, self.curr_labels, self.val_labels, self.test_labels, self.fulltest_labels = copy.deepcopy(
