@@ -117,13 +117,6 @@ In CI-ImageNet2K, increase one and decrease the other:
 - Add the dataset folder name exactly to `src/opts.py`
 - Run you model with `--dataset your_fav_dataset`!
 
-## Reproducing Results
-
-To replicate the complete set of experiments, 
-
-- TBA
-
-
 
 ##### If you discover any bugs in the code please contact me, I will cross-check them with my nightmares.
 
